@@ -1,0 +1,7 @@
+packet:
+  capture:
+    server:
+      port: 59766
+    monitor:
+      type: TCP
+      port: 1200

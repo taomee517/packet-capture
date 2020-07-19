@@ -1,0 +1,73 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/"}
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.4.RELEASE")
+        classpath("io.spring.gradle:dependency-management-plugin:1.0.9.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: "maven-publish"
+apply plugin: "io.spring.dependency-management"
+
+group = "com.aero"
+version = "1.0-SNAPSHOT"
+archivesBaseName = 'packet-capture'
+def parentVersion = '1.0-SNAPSHOT'
+
+configurations.all{
+    resolutionStrategy(){
+        //将冲突解决策略改为发生冲突时报错
+        failOnVersionConflict()
+        force "org.slf4j:slf4j-api:1.7.30"
+        //srpring-fox.2.9.2 中的1.5.20版本会报NumberFormatException
+        force "io.swagger:swagger-annotations:1.5.21"
+        force "io.swagger:swagger-models:1.5.21"
+    }
+}
+
+// 冲突报错 + 以下任务 + 命令行搜索
+// gradlew allDepInsight  --configuration compile --dependency ${keyword}
+//可以搜索出某个jar包被哪些依赖引用，然后用于解决依赖冲突
+//subprojects和allprojects的效果一样
+task allDepInsight(type: DependencyInsightReportTask){
+    doFirst {}
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("com.aero:aero-parent:${parentVersion}")
+    }
+}
+
+dependencies {
+    //引入项目内的其它模块
+    compile "com.aero:aero-common"
+
+    //引入项目内的jar文件
+    compile files('libs/jpcap.jar')
+
+    compile("org.springframework.boot:spring-boot-starter") {
+        exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
+        exclude group:"org.jboss.logging", module: "jboss-logging"
+    }
+
+    /**log4j2*/
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2'
+
+    // lombok
+    compile group: 'org.projectlombok', name: 'lombok'
+    annotationProcessor "org.projectlombok:lombok"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

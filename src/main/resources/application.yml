@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: packet-capture
+
+  profiles:
+    active: dev
