@@ -22,7 +22,9 @@ public class FrameEncoder extends MessageToByteEncoder {
             byte[] captureContent = ((byte[]) msg);
             ByteBuf buf = Unpooled.wrappedBuffer(captureContent);
             out.writeBytes(buf);
-        }else {
+        }else if(msg instanceof ByteBuf){
+           out.writeBytes(((ByteBuf) msg));
+        } else {
             log.error("抓包内容格式不对，请转为字节数组格式");
         }
     }

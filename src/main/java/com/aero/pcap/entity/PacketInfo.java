@@ -17,7 +17,7 @@ public class PacketInfo {
     private String srcMac;
     private String destMac;
     private String srcIp;
-    private String descIp;
+    private String destIp;
     private PacketType type;
     private int srcPort;
     private int destPort;

@@ -102,7 +102,7 @@ public class Analyse {
 			ARPPacket arp = (ARPPacket) p;
 			info.setType(PacketType.ARP);
 			info.setSrcIp(arp.getSenderProtocolAddress().toString());
-			info.setDescIp(arp.getTargetProtocolAddress().toString());
+			info.setDestIp(arp.getTargetProtocolAddress().toString());
 		}
 		else if (p instanceof IPPacket) {
 			if (((IPPacket)p).version==4) {
@@ -125,7 +125,7 @@ public class Analyse {
 			}
 			IPPacket ip=(IPPacket)p;
 			info.setSrcIp(ip.src_ip.getHostAddress());
-			info.setDescIp(ip.dst_ip.getHostAddress());
+			info.setDestIp(ip.dst_ip.getHostAddress());
 		}
 		else{
 			info.setType(PacketType.OTHERS);

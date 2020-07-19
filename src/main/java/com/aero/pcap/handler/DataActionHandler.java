@@ -1,9 +1,13 @@
 package com.aero.pcap.handler;
 
+import com.aero.common.utils.ProtobufUtil;
 import com.aero.pcap.capture.Analyse;
 import com.aero.pcap.capture.Captor;
 import com.aero.pcap.entity.PacketInfo;
 import com.aero.pcap.entity.PacketType;
+import com.aero.pcap.utils.EscapeUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
@@ -86,7 +90,13 @@ public class DataActionHandler extends ChannelDuplexHandler {
                         PacketInfo detail = analyse.getDetail(packet);
                         if(monitorType.equalsIgnoreCase(detail.getType().name()) && (detail.getSrcPort()==monitorPort || detail.getDestPort()==monitorPort)){
                             log.info("读取抓包数据， 类型：{}, SRC端口：{}, DST端口：{}, 消息长度：{}", monitorType, detail.getSrcPort(),detail.getDestPort(),detail.getContent().length);
-                            dataPubChannel.writeAndFlush(detail.getContent());
+                            byte[] bytes = ProtobufUtil.serialize(detail);
+                            ByteBuf buf = Unpooled.buffer();
+                            buf.writeByte(EscapeUtil.SIGN_CODE);
+                            buf.writeBytes(bytes);
+                            buf.writeByte(EscapeUtil.SIGN_CODE);
+                            ByteBuf msg = EscapeUtil.escape(buf);
+                            dataPubChannel.writeAndFlush(msg);
                         }
                     }
                     break;

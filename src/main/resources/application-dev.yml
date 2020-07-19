@@ -4,4 +4,4 @@ packet:
       port: 59766
     monitor:
       type: TCP
-      port: 1200
+      port: 443
